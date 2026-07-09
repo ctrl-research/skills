@@ -1,45 +1,27 @@
-# template
+# skills
 
-Template repository for `gravityctl` projects.
+A library of reusable agent skills. See [AGENTS.md](AGENTS.md) for repository
+structure and authoring conventions; start new skills from
+[templates/skill-template](templates/skill-template/SKILL.md).
 
-## What's Included
+## Skill Catalog
 
-- **Renovate** — automated dependency updates for Docker, Go modules, and GitHub Actions
+| Skill | Description |
+|---|---|
+| [org-defaults](skills/org-defaults/SKILL.md) | ctrl-research org values and governance policy referenced by the other skills |
+| [pr-commit-conventions](skills/pr-commit-conventions/SKILL.md) | Conventions for branches, commit messages, and pull requests |
+
+## Using a Skill
+
+Copy a skill's directory into the target agent environment (e.g.
+`.claude/skills/` or `.agents/skills/` in the consuming repo). Skills are
+org-neutral by convention; install [org-defaults](skills/org-defaults/SKILL.md)
+alongside them to apply ctrl-research values and governance policy.
+
+## Repository
+
+- **Structure and authoring conventions** — [AGENTS.md](AGENTS.md)
+- **New skills** — start from [templates/skill-template](templates/skill-template/SKILL.md)
+- **CODEOWNERS** — `@ctrl-research/reviewers` auto-requested on PRs
 - **Branch protection** — `main` requires PRs and review
-- **CODEOWNERS** — `@gravityctl/reviewers` auto-requested for review
-- **MIT License**
-- **.gitignore** — common exclusions for OS, IDE, build outputs, and secrets
-
-## Using This Template
-
-1. Click **Use this template** to create a new repository
-2. Update `renovate.json` to configure managers and schedules for your project
-3. Enable the new repo in the Renovate GitHub App if using hosted Renovate
-
-## Renovate
-
-Dependency updates are managed via Renovate. Configuration is in `renovate.json` and `.github/renovate-config.js`.
-
-Enabled managers:
-- `docker-compose`
-- `github-actions`
-- `gomod`
-
-Add or remove managers as needed for your project.
-
-## Files
-
-```
-.
-├── .github/
-│   ├── CODEOWNERS           # Auto-request review from @gravityctl/reviewers
-│   ├── renovate-config.js   # Renovate platform config
-│   └── workflows/
-│       └── renovate.yaml    # Renovate GitHub Action workflow
-├── .gitignore
-├── CONTRIBUTING.md
-├── LICENSE
-├── README.md
-├── renovate.json           # Renovate settings
-└── SECURITY.md
-```
+- **Renovate** — dependency updates (`renovate.json`, `.github/renovate-config.js`)

@@ -2,6 +2,8 @@
 
 ## Purpose
 
+This is a general-purpose **skills repository**: a library of reusable agent skills (self-contained `SKILL.md` packages) that can be installed into agent environments such as Claude Code. The skills themselves are the product of this repo — there is no application code.
+
 This repository may be worked on by humans and AI coding agents.  
 This document defines the operational expectations, conventions, and guardrails for contributors and autonomous agents.
 
@@ -165,136 +167,83 @@ Relevant docs may include:
 
 ---
 
-# Git & Commit Guidance
-
-## Repository Structure
-
-> This section is intentionally lightweight in the template repository.
-> Projects should customize it as the architecture evolves.
+# Repository Structure
 
 ```text
 /
-├── src/                # Application source code
-├── tests/              # Automated tests
-├── docs/               # Project documentation
-├── scripts/            # Utility and automation scripts
-├── config/             # Configuration files/templates
-├── examples/           # Example usage or sample apps
-├── assets/             # Static assets
-├── .github/            # CI/CD and GitHub workflows
-└── README.md           # Project overview and setup
+├── skills/                     # The product of this repo: one directory per skill
+│   └── <skill-name>/           # kebab-case; must match the skill's frontmatter name
+│       ├── SKILL.md            # Required: YAML frontmatter + instructions
+│       ├── references/         # Optional: detailed docs loaded on demand
+│       ├── scripts/            # Optional: executable helpers the skill invokes
+│       └── assets/             # Optional: templates/files used in skill output
+├── templates/
+│   └── skill-template/         # Copy this to start a new skill
+├── docs/                       # Repo-level docs (authoring guide, review checklist)
+├── .agents/                    # Config for agents working ON this repo
+│   ├── instructions/           # Repo-local agent instructions
+│   └── skills/                 # Repo-local skills (e.g. a "new-skill" scaffolder)
+├── .github/                    # CI, CODEOWNERS, Renovate
+├── AGENTS.md                   # This file
+└── README.md                   # Catalog of available skills + install instructions
 ```
 
-## Commit Style
+Note the distinction: `skills/` holds the distributable skills this repo exists to share; `.agents/` holds tooling for agents contributing to this repo itself.
 
-Prefer concise, descriptive commits.
+---
 
-Examples:
+# Skill Authoring Conventions
 
-- `fix auth token refresh race condition`
-- `add retry handling for webhook delivery`
-- `refactor cache invalidation logic`
+## Layout
 
-## Pull Requests
+- One skill per directory under `skills/`, named in kebab-case.
+- Every skill must have a `SKILL.md` with YAML frontmatter containing at minimum:
+  - `name` — must exactly match the directory name
+  - `description` — states **what the skill does** and **when to use it**; this is
+    what an agent reads to decide whether to load the skill, so include concrete
+    trigger phrases and use cases
+- Keep `SKILL.md` focused (roughly under 500 lines). Move deep detail into
+  `references/` files and link to them, so they are only loaded when needed.
+- `scripts/` contents must be self-contained and runnable without repo-external
+  setup; document any required tools at the top of the script.
 
-All changes must go through a Pull Request (PR).
+## Quality Bar
 
-PRs should:
+- A skill should be usable by an agent with no context beyond the skill itself.
+- Prefer imperative, unambiguous instructions over background prose.
+- Include examples of correct output where the format matters.
+- Test a skill by actually invoking it in an agent session before submitting.
+- Update the skill catalog in `README.md` when adding, renaming, or removing a skill.
 
-- stay focused on a single concern
-- include a clear summary
-- explain rationale for non-obvious decisions
-- mention testing performed
-- note follow-up work if applicable
+## Scope
 
-PR descriptions should include:
+- One skill per PR when adding or substantially reworking a skill.
+- Don't create overlapping skills; extend an existing one instead.
+- Skills must not embed secrets, tokens, or organization-internal URLs that
+  would break for other users.
+- Keep skills org-neutral: org-specific values (org name, reviewer teams,
+  ticket formats, governance policy) live only in the
+  [org-defaults](skills/org-defaults/SKILL.md) skill. Other skills refer
+  to it by name and may include a generic inline fallback, so each skill
+  stays reusable outside this organization as-is.
 
-- summary of changes
-- motivation
-- testing performed
-- screenshots/examples if UI-related
-- known limitations or follow-ups
+---
 
+# Git & Commit Guidance
 
-## Branching
+## Branch, Commit, and PR Conventions
 
-Agents must NEVER work directly on the default branch.
+This repo follows its own skills:
+[pr-commit-conventions](skills/pr-commit-conventions/SKILL.md) for branch
+naming, commit message format (Conventional Commits), PR structure, and
+the pre-review checklist; [org-defaults](skills/org-defaults/SKILL.md)
+for org values and governance policy (protected branches, review
+requirements, large-change process). Read and apply both before
+committing or opening a PR. If working on either skill itself, the
+version on the default branch is the one in effect.
 
-Before making changes:
-
-1. Create a new branch from the latest default branch.
-2. Use a descriptive branch name.
-
-Examples:
-
-- `fix/auth-token-refresh`
-- `feature/add-webhook-retries`
-- `docs/update-install-guide`
-
-## Protected Branches
-
-Agents must NOT:
-
-- push directly to `main` or `master`
-- force-push protected branches
-- rewrite shared branch history
-- bypass branch protection or review requirements
-
-## Commit Practices
-
-Prefer small, logical commits over large monolithic commits.
-
-Avoid:
-
-- unrelated formatting-only commits
-- mixing refactors with behavior changes
-- autogenerated noise unless necessary
-
-## Rebasing & Merging
-
-Agents should:
-
-- prefer clean, understandable history
-- avoid destructive rebases on shared branches
-- sync with the default branch before opening PRs if needed
-
-## CI/CD Expectations
-
-Before requesting merge, agents should:
-
-- run relevant tests
-- run linting/formatting if configured
-- verify builds/type-checks pass where applicable
-
-If something cannot be verified locally, explicitly state that.
-
-## Human Review
-
-Human review is required before:
-
-- merging PRs
-- releasing to production
-- modifying infrastructure
-- changing security-sensitive code
-- performing destructive migrations
-
-## Large Changes
-
-For substantial refactors or architecture changes:
-
-1. Open an issue/discussion first if applicable.
-2. Break work into smaller reviewable PRs.
-3. Preserve backward compatibility when possible.
-
-## Auditability
-
-Agents should maintain clear traceability between:
-
-- issue/task
-- branch
-- commits
-- PR description
-- resulting change
+This repo has no governance overrides. If any are ever needed, they go
+here and take precedence over the skills' defaults.
 
 ---
 
